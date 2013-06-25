@@ -24,6 +24,6 @@ class Command(BaseCommand):
     if houseAddr:
       house = House(address=houseAddr, owner=owner)
       house.save()
-      self.stdout.write('Added house: name=[%s] owner=[%s] id=[%d]' % (house.address, house.owner, house.id) )
+      self.stdout.write('Added house: address=[%s] owner=[%s] id=[%d]' % (house.address, house.owner, house.id) )
     else:
       raise CommandError('must specify the house address')
