@@ -6,17 +6,18 @@ class Command(BaseCommand):
 
   option_list = BaseCommand.option_list + (
     make_option('--owner', action='store', type='string', help='show houses for an owner'),
+    make_option('--addr_contains', action='store', type='string'),
   )
 
   def handle(self, *args, **options):
-    ownerName = options['owner']
+    ownerName, addrTerm = options['owner'], options['addr_contains']
     if ownerName:
       try:
         owner = Owner.objects.get(name=ownerName)
-        houses = House.objects.all().filter(owner=owner)
       except:
-        raise CommandError('owner with name: %s dose not exist' % ownerName)
+        raise CommandError('owner with name: %s does not exist' % ownerName)
+      houses = House.objects.addrContainsOrOwner(addrTerm, owner)
     else:
-      houses = House.objects.all()
+      houses = House.objects.addrContainsOrAll(addrTerm)
     for house in houses:
-      self.stdout.write('address=[%s] owner=[%s]' % (house.address, house.owner) )   
+      self.stdout.write('address=[%s] owner=[%s] id=[%d]' % (house.address, house.owner, house.id) )   

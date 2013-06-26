@@ -12,12 +12,8 @@ class Command(BaseCommand):
   def handle(self, *args, **options):
     houseAddr, ownerName = options['address'], options['owner']
     if ownerName:
-      try:
-        owner = Owner.objects.get(name=ownerName)
-      except:
-        owner = Owner(name=ownerName)
-        owner.save()
-        owner = Owner.objects.get(name=ownerName)
+      owner, newOwner = Owner.objects.getOrSave(ownerName)
+      if newOwner:
         self.stdout.write('Added owner: name=[%s] id=[%d]' % (owner.name, owner.id) )
     else:
       raise CommandError('must specify the house owner')

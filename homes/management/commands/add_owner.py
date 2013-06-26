@@ -10,10 +10,7 @@ class Command(BaseCommand):
 
   def handle(self, *args, **options):
     ownerName = options['name']
-    try:
-      owner = Owner(name=ownerName)
-      owner.save()
-    except:
+    owner, newOwner = Owner.objects.getOrSave(ownerName)
+    if not newOwner:
       raise CommandError('an owner with name %s already exists' % ownerName)
-    owner = Owner.objects.get(name=ownerName)
     self.stdout.write('Added owner: name=[%s] id=[%d]' % (owner.name, owner.id))
