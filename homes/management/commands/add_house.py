@@ -14,12 +14,14 @@ class Command(BaseCommand):
     if ownerName:
       owner, newOwner = Owner.objects.getOrSave(ownerName)
       if newOwner:
-        self.stdout.write('Added owner: name=[%s] id=[%d]' % (owner.name, owner.id) )
+        self.stdout.write('Added owner: id=[%d] name=[%s]' % (owner.id, owner.name) )
     else:
       raise CommandError('must specify the house owner')
     if houseAddr:
-      house = House(address=houseAddr, owner=owner)
-      house.save()
-      self.stdout.write('Added house: address=[%s] owner=[%s] id=[%d]' % (house.address, house.owner, house.id) )
+      house = House.objects.getOrSaveAndAdd(houseAddr, owner)
+      if house:
+        self.stdout.write('Added house: id=[%d] address=[%s] owner=[%s]' % (house.id, house.address, owner.name) )
+      else:
+        raise CommandError('that address already has an owner')
     else:
       raise CommandError('must specify the house address')

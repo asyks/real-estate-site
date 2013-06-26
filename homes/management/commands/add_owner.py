@@ -13,4 +13,4 @@ class Command(BaseCommand):
     owner, newOwner = Owner.objects.getOrSave(ownerName)
     if not newOwner:
       raise CommandError('an owner with name %s already exists' % ownerName)
-    self.stdout.write('Added owner: name=[%s] id=[%d]' % (owner.name, owner.id))
+    self.stdout.write('Added owner: id=[%d] name=[%s]' % (owner.id, owner.name))

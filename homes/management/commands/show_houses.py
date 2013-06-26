@@ -11,13 +11,15 @@ class Command(BaseCommand):
 
   def handle(self, *args, **options):
     ownerName, addrTerm = options['owner'], options['addr_contains']
+    owner = None
     if ownerName:
       try:
         owner = Owner.objects.get(name=ownerName)
       except:
-        raise CommandError('owner with name: %s does not exist' % ownerName)
-      houses = House.objects.addrContainsOrOwner(addrTerm, owner)
-    else:
-      houses = House.objects.addrContainsOrAll(addrTerm)
+        raise CommandError('owner with name %s does not exist' % ownerName)
+    houses = House.objects.getByAddrOrOwner(addrTerm, owner)
     for house in houses:
-      self.stdout.write('address=[%s] owner=[%s] id=[%d]' % (house.address, house.owner, house.id) )   
+      self.stdout.write('House: id=[%d] address=[%s]' % (house.id, house.address) )   
+      for owner in house.owner.all():
+        self.stdout.write(' Owner: name=[%s]' % owner.name )   
+

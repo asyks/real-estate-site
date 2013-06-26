@@ -1,8 +1,9 @@
 from django.db import models
 
-# models for homes app: homes owners
+## models for homes app: House, Owner 
 
-class OwnerManager(models.Manager):
+## Owner model manager object for use with OneToOne relationship
+class OwnerManagerOneToOne(models.Manager):
 
   def getOrSave(self, ownerName):
     try:
@@ -11,41 +12,81 @@ class OwnerManager(models.Manager):
     except:
       owner = Owner(name=ownerName)
       owner.save()
-      owner = Owner.objects.get(name=ownerName) 
       newOwner = True
     return owner, newOwner
 
+## Owner model manager object for use with ManyToMany relationship
+class OwnerManagerManyToMany(OwnerManagerOneToOne):
+
+  def something(self):
+    pass
+
+## Owner model for homes app
 class Owner(models.Model):
 
   name = models.TextField(unique=True) 
 
-  objects = OwnerManager()
+  objects = OwnerManagerManyToMany()
+  ## uncomment the line below and comment out the line above to switch back to
+  ## switch between ManyToMany and OneToOne model.Manager
+  # objects = OwnerManagerOneToOne()
 
   def __unicode__(self):
     return self.name
 
-class HouseManager(models.Manager):
+## House model manager object for use with ManyToMany relationship
+class HouseManagerManyToMany(models.Manager):
 
-  def addrContainsOrOwner(self, addrTerm, owner):
-    if addrTerm:
-      houses = House.objects.all().filter(address__contains=addrTerm, owner=owner)
-    else:
-      houses = House.objects.all().filter(owner=owner)
-    return houses
-
-  def addrContainsOrAll(self, addrTerm):
+  def getByAddrOrOwner(self, addrTerm=None, owner=None):
     if addrTerm:
       houses = House.objects.all().filter(address__contains=addrTerm)
     else:
       houses = House.objects.all()
     return houses
 
+  def getOrSaveAndAdd(self, houseAddr, owner):
+    try:
+      house = House.objects.get(address=houseAddr)
+    except:
+      house = House(address=houseAddr)
+      house.save()
+    house.owner.add(owner)
+    return house
+
+## House model manager object for use with OneToOne relationship
+class HouseManagerOneToOne(models.Manager):
+
+  def getByAddrOrOwner(self, addrTerm=None, owner=None):
+    if owner:
+      if addrTerm:
+        houses = House.objects.all().filter(address__contains=addrTerm, owner=owner)
+      else:
+        houses = House.objects.all().filter(owner=owner)
+    else:
+      if addrTerm:
+        houses = House.objects.all().filter(address__contains=addrTerm)
+      else:
+        houses = House.objects.all()
+      return houses
+
+  def getOrSaveAndAdd(self, houseAddr, owner):
+    house = House(address=houseAddr, owner=owner)
+    house.save()
+    return house
+
+## House model for homes app
 class House(models.Model):
 
   address = models.TextField(unique=True)
-  owner = models.OneToOneField(Owner)
+  owner = models.ManyToManyField(Owner)
+  ## uncomment the line below and comment out the line above to switch back to
+  ## a One to One relationship between Houses and Owners
+  # owner = models.OneToOneField(Owner)
 
-  objects = HouseManager()
+  objects = HouseManagerManyToMany()
+  ## uncomment the line below and comment out the line above to switch back to
+  ## switch between ManyToMany and OneToOne model.Manager
+  # objects = HouseManagerOneToOne()
 
   def __unicode__(self):
-    return self.name
+    return self.address
