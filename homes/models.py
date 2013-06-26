@@ -53,6 +53,13 @@ class HouseManagerManyToMany(models.Manager):
     house.owner.add(owner)
     return house
 
+  def getHouseOwners(self, houses):
+    owners = []
+    for house in houses:
+      for owner in house.owner.all():
+        owners.append(owner)
+    return owners
+
 ## House model manager object for use with OneToOne relationship
 class HouseManagerOneToOne(models.Manager):
 
@@ -73,6 +80,12 @@ class HouseManagerOneToOne(models.Manager):
     house = House(address=houseAddr, owner=owner)
     house.save()
     return house
+
+  def getHouseOwners(self, houses):
+    owners = []
+    for house in houses:
+      owners.append(house.owner)
+    return owners
 
 ## House model for homes app
 class House(models.Model):
