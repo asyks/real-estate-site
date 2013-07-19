@@ -17,7 +17,7 @@ class Command(BaseCommand):
         owner = Owner.objects.get(name=ownerName)
       except:
         raise CommandError('owner with name %s does not exist' % ownerName)
-    houses = House.objects.getByAddrOrOwner(addrTerm, owner)
+    houses = House.objects.getByAddrOrOwner(addrTerm, owner=None)
     for house in houses:
       self.stdout.write('House: id=[%d] address=[%s]' % (house.id, house.address) )   
       for owner in house.owner.all():

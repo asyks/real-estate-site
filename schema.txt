@@ -4,11 +4,18 @@ CREATE TABLE "homes_owner" (
     "name" text NOT NULL UNIQUE
 )
 ;
-CREATE TABLE "homes_house" (
+CREATE TABLE "homes_house_owner" (
     "id" serial NOT NULL PRIMARY KEY,
-    "address" text NOT NULL UNIQUE,
-    "owner_id" integer NOT NULL UNIQUE REFERENCES "homes_owner" ("id") DEFERRABLE INITIALLY DEFERRED
+    "house_id" integer NOT NULL,
+    "owner_id" integer NOT NULL REFERENCES "homes_owner" ("id") DEFERRABLE INITIALLY DEFERRED,
+    UNIQUE ("house_id", "owner_id")
 )
 ;
+CREATE TABLE "homes_house" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "address" text NOT NULL UNIQUE
+)
+;
+ALTER TABLE "homes_house_owner" ADD CONSTRAINT "house_id_refs_id_3dec18a3" FOREIGN KEY ("house_id") REFERENCES "homes_house" ("id") DEFERRABLE INITIALLY DEFERRED;
 
 COMMIT;
